@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 
 import authRoutes from './routes/authRoutes.js';
@@ -23,13 +24,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Health Check Route
-app.get('/', (req, res) => {
-    res.status(200).json({ status: 'API is running', environment: process.env.NODE_ENV });
-});
-app.get('/api', (req, res) => {
-    res.status(200).json({ status: 'API is running', environment: process.env.NODE_ENV });
-});
+// Health Check Logic
+const checkHealth = (req, res) => {
+    const dbState = mongoose.connection.readyState;
+    let dbStatus = 'Disconnected';
+    if (dbState === 1) dbStatus = 'Connected';
+    if (dbState === 2) dbStatus = 'Connecting';
+
+    res.status(200).json({ 
+        status: 'API is running', 
+        environment: process.env.NODE_ENV,
+        database: dbStatus
+    });
+};
+
+// Health Check Routes
+app.get('/', checkHealth);
+app.get('/api', checkHealth);
 
 // Routes
 app.use('/api/auth', authRoutes);
