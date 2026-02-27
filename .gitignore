@@ -1,0 +1,18 @@
+# Ignore full project modules and build outputs
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Env files
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
