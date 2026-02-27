@@ -23,6 +23,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Health Check Route
+app.get('/', (req, res) => {
+    res.status(200).json({ status: 'API is running', environment: process.env.NODE_ENV });
+});
+app.get('/api', (req, res) => {
+    res.status(200).json({ status: 'API is running', environment: process.env.NODE_ENV });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
