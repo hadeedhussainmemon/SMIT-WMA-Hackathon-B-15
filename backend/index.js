@@ -41,9 +41,9 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: (origin, callback) => {
-        // Dynamically whitelist all origins for hackathon testing purposes
-        callback(null, true);
+    origin: function (origin, callback) {
+        // Reflect the incoming origin explicitly to allow credentials during testing
+        callback(null, origin || '*');
     },
     credentials: true,
 }));
