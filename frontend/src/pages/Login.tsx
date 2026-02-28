@@ -16,7 +16,7 @@ const Login = () => {
         e.preventDefault();
         try {
             const userData = await login({ email, password }).unwrap();
-            dispatch(setCredentials({ user: userData.user, token: userData.token }));
+            dispatch(setCredentials({ user: userData, token: 'cookie-based' }));
             navigate('/dashboard');
         } catch (err) {
             console.error('Failed to log in', err);

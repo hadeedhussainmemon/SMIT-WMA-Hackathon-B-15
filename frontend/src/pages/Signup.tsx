@@ -20,7 +20,7 @@ const Signup = () => {
         e.preventDefault();
         try {
             const userData = await signup({ name, email, password, role }).unwrap();
-            dispatch(setCredentials({ user: userData.user, token: userData.token }));
+            dispatch(setCredentials({ user: userData, token: 'cookie-based' }));
             navigate('/dashboard');
         } catch (err) {
             console.error('Failed to sign up', err);
