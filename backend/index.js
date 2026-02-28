@@ -41,7 +41,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        // Dynamically whitelist all origins for hackathon testing purposes
+        callback(null, true);
+    },
     credentials: true,
 }));
 app.use(express.json());
