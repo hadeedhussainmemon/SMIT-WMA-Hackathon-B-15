@@ -4,7 +4,7 @@ import { useGetPrescriptionsQuery, useCreatePrescriptionMutation } from '../../s
 import { useGetMySubscriptionQuery } from '../../store/api/subscriptionApiSlice';
 import { useAnalyzeSymptomsMutation, useSuggestPrescriptionMutation } from '../../store/api/aiApiSlice';
 import { skipToken } from '@reduxjs/toolkit/query';
-import { format } from 'date-fns';
+import { format, differenceInYears } from 'date-fns';
 import {
     Calendar,
     Stethoscope,
@@ -14,10 +14,12 @@ import {
     Lock,
     ChevronRight,
     Loader2,
-    Activity
+    Activity,
+    ShieldAlert
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import { useSelector } from 'react-redux';
+import { useGetPatientsQuery } from '../../store/api/patientApiSlice';
 import type { RootState } from '../../store';
 
 const DoctorDashboard = () => {
@@ -52,8 +54,19 @@ const DoctorDashboard = () => {
     // AI Form States
     const [symptoms, setSymptoms] = useState('');
     const [aiAnalysis, setAiAnalysis] = useState('');
+    const [aiRiskLevel, setAiRiskLevel] = useState('');
+    const [aiAdvice, setAiAdvice] = useState('');
     const [diagnosis, setDiagnosis] = useState('');
     const [aiPrescription, setAiPrescription] = useState('');
+
+    // Fetch patient profile for actual demographics
+    const { data: allPatients } = useGetPatientsQuery({});
+    const selectedPatientProfile = allPatients?.find((p: any) => p.user?._id === selectedPatient?.patientId);
+
+    const patientAge = selectedPatientProfile?.dateOfBirth
+        ? differenceInYears(new Date(), new Date(selectedPatientProfile.dateOfBirth))
+        : 30;
+    const patientGender = selectedPatientProfile?.gender || 'Male';
 
     const handlePatientSelect = (apt: any) => {
         if (!apt.patient) return;
@@ -76,13 +89,12 @@ const DoctorDashboard = () => {
         try {
             const res = await analyzeSymptoms({
                 symptoms,
-                patientAge: 30,
-                patientGender: 'Male'
+                patientAge,
+                patientGender
             }).unwrap();
             setAiAnalysis(res.analysis);
-            if (res.riskLevel === 'High') {
-                alert('⚠️ HIGH RISK DETECTED: ' + res.advice);
-            }
+            setAiRiskLevel(res.riskLevel);
+            setAiAdvice(res.advice);
         } catch (error) {
             console.error('Failed to analyze', error);
         }
@@ -340,10 +352,27 @@ const DoctorDashboard = () => {
                                                     </h4>
                                                     <span className="text-[9px] font-black text-white/40 tracking-widest">v2.4 BETA</span>
                                                 </header>
-                                                <div className="text-emerald-50/90 text-sm leading-[1.8] whitespace-pre-wrap font-bold selection:bg-emerald-500 selection:text-white">
+                                                <div className="text-emerald-50/90 text-sm leading-[1.8] whitespace-pre-wrap font-bold selection:bg-emerald-500 selection:text-white mb-10">
                                                     {aiAnalysis}
                                                 </div>
-                                                <div className="mt-10 pt-8 border-t border-white/10">
+
+                                                {/* Augmented Risk Intelligence */}
+                                                <div className={`p-6 rounded-3xl border ${aiRiskLevel === 'High' ? 'bg-rose-500/10 border-rose-500/20' : aiRiskLevel === 'Medium' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-emerald-500/10 border-emerald-500/20'} mb-10`}>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <ShieldAlert className={`w-5 h-5 ${aiRiskLevel === 'High' ? 'text-rose-500' : aiRiskLevel === 'Medium' ? 'text-amber-500' : 'text-emerald-500'}`} />
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-white/60">Risk Assessment</span>
+                                                        </div>
+                                                        <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${aiRiskLevel === 'High' ? 'bg-rose-500 text-white' : aiRiskLevel === 'Medium' ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                                                            {aiRiskLevel} Risk
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm font-bold text-white/90 leading-relaxed italic">
+                                                        {aiAdvice}
+                                                    </p>
+                                                </div>
+
+                                                <div className="pt-8 border-t border-white/10">
                                                     <button
                                                         onClick={() => setActiveTab('prescription')}
                                                         className="px-8 py-3 bg-emerald-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-400 transition-all flex items-center gap-3 shadow-lg shadow-emerald-500/20"

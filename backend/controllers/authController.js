@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Subscription from '../models/Subscription.js';
 import jwt from 'jsonwebtoken';
 
 const generateToken = (res, userId) => {
@@ -24,11 +25,16 @@ export const authUser = async (req, res) => {
 
     if (user && (await user.matchPassword(password))) {
         generateToken(res, user._id);
+
+        // Find subscription
+        const sub = await Subscription.findOne({ clinicAdmin: user._id });
+
         res.status(200).json({
             _id: user._id,
             name: user.name,
             email: user.email,
             role: user.role,
+            planTier: sub?.planTier || 'Free'
         });
     } else {
         res.status(401);
@@ -58,11 +64,16 @@ export const registerUser = async (req, res) => {
 
     if (user) {
         generateToken(res, user._id);
+
+        // Default Free subscription for new users
+        await Subscription.create({ clinicAdmin: user._id, planTier: 'Free' });
+
         res.status(201).json({
             _id: user._id,
             name: user.name,
             email: user.email,
             role: user.role,
+            planTier: 'Free'
         });
     } else {
         res.status(400);
@@ -96,12 +107,14 @@ export const updateUserProfile = async (req, res) => {
         }
 
         const updatedUser = await user.save();
+        const sub = await Subscription.findOne({ clinicAdmin: updatedUser._id });
 
         res.status(200).json({
             _id: updatedUser._id,
             name: updatedUser.name,
             email: updatedUser.email,
             role: updatedUser.role,
+            planTier: sub?.planTier || 'Free'
         });
     } else {
         res.status(404);

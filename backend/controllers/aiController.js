@@ -1,5 +1,7 @@
 // Make sure to install axios in the backend: npm install axios
 import axios from 'axios';
+import Subscription from '../models/Subscription.js';
+import User from '../models/User.js';
 
 // @desc    Analyze symptoms using Grok API
 // @route   POST /api/ai/symptom-checker
@@ -9,6 +11,16 @@ const analyzeSymptoms = async (req, res, next) => {
         if (req.user.role !== 'doctor') {
             res.status(403);
             throw new Error('Only doctors can access the AI symptom checker');
+        }
+
+        // Subscription Gate (Backend)
+        // Note: For a real SaaS, we'd lookup the clinicAdmin associated with this doctor.
+        // For this hackathon, we assume the doctor is the subscriber or linked to one.
+        // We'll check if a Pro subscription exists for this user (acting as clinic owner)
+        const sub = await Subscription.findOne({ clinicAdmin: req.user._id });
+        if (!sub || sub.planTier !== 'Pro') {
+            res.status(403);
+            throw new Error('Pro subscription required for AI diagnostics');
         }
 
         const { symptoms, patientAge, patientGender } = req.body;
@@ -61,6 +73,12 @@ const suggestPrescription = async (req, res, next) => {
         if (req.user.role !== 'doctor') {
             res.status(403);
             throw new Error('Only doctors can access AI prescription suggestions');
+        }
+
+        const sub = await Subscription.findOne({ clinicAdmin: req.user._id });
+        if (!sub || sub.planTier !== 'Pro') {
+            res.status(403);
+            throw new Error('Pro subscription required for AI prescriptions');
         }
 
         const { diagnosis, patientAge, patientGender } = req.body;

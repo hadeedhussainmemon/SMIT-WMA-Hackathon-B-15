@@ -88,6 +88,39 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Neural Logic (How it Works) */}
+            <section id="how-it-works" className="py-32 px-8 bg-slate-50/50 relative overflow-hidden">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-24">
+                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em] mb-4">Neural Logic Workflow</p>
+                        <h2 className="text-5xl font-black text-slate-900 tracking-tighter">The Closed-Loop <br />Clinical Cycle.</h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative">
+                        {/* Connecting Line (Desktop) */}
+                        <div className="hidden md:block absolute top-[28%] left-[10%] right-[10%] h-[1px] bg-emerald-500/10 -z-10"></div>
+
+                        {[
+                            { step: '01', title: 'Portal Sync', desc: 'Patients book via high-fidelity glassmorphic terminals.', icon: <Users /> },
+                            { step: '02', title: 'Front Desk', desc: 'Receptionists orchestrate waitlists in real-time.', icon: <Activity /> },
+                            { step: '03', title: 'Neural Diag', desc: 'Doctors deploy Grok-powered symptom engines.', icon: <Brain /> },
+                            { step: '04', title: 'Smart Regimen', desc: 'AI translates prescriptions into lifestyle advice.', icon: <Stethoscope /> }
+                        ].map((s, i) => (
+                            <div key={i} className="flex flex-col items-center text-center group">
+                                <div className="w-16 h-16 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-900 mb-8 shadow-sm group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">
+                                    <span className="w-6 h-6">{s.icon}</span>
+                                </div>
+                                <div className="space-y-4">
+                                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em]">{s.step}</p>
+                                    <h3 className="text-xl font-black text-slate-900 tracking-tight">{s.title}</h3>
+                                    <p className="text-sm text-slate-400 font-bold italic leading-relaxed">{s.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* Features Grid */}
             <section id="features" className="py-32 px-8">
                 <div className="max-w-7xl mx-auto">
