@@ -6,7 +6,7 @@
 
 Welcome to your brand new Medical Clinic Management System! 
 
-If you are a beginner, don't worry! This project is designed to be easy to understand. CuraAI is a next-generation SaaS Operating System designed exclusively for modern medical clinics. Built as the final project for the SMIT WMA Hackathon (B-15), it bridges the gap between doctors and patients by replacing outdated paper records with intelligent symptom analysis, automated digital prescriptions, and seamless appointment scheduling.
+If you are a beginner, don't worry! This project is designed to be easy to understand. CuraAI is a medical clinic management prototype built for the **SMIT WMA Hackathon (B-15)**. It demonstrates how to bridge the gap between doctors and patients by replacing outdated paper records with intelligent symptom analysis, automated digital prescriptions, and seamless appointment scheduling.
 
 🔗 **[View Source Code on GitHub](https://github.com/hadeedhussainmemon/SMIT-WMA-Hackathon-B-15)**
 
@@ -73,14 +73,6 @@ Now your beautiful site is live, but the Frontend needs permission to talk to th
 3.  Add a new variable called `FRONTEND_URL` and paste that link.
 4.  Go to the Deployments tab and click **Redeploy**.
 
-***
 
-## 💡 How to Improve This App Further?
-If you want to take this project to the next level after the Hackathon, consider adding these premium features:
-
-1.  **Email Notifications (Nodemailer/SendGrid):** Automatically send an email to the Patient when the Receptionist confirms their appointment.
-2.  **Payment Gateway (Stripe):** Allow patients to actually pay for their appointment slot when they book it in the portal.
-3.  **Telehealth Video Calls (WebRTC/Agora):** Add a button in the Patient and Doctor dashboards to start a secure video call for remote consultations.
-4.  **Cloudinary PDF Storage:** Currently, the PDFs download locally. You can use the backend `/api/prescriptions` endpoint to automatically upload the generated PDF directly to a permanent Cloudinary bucket.
 
 🎉 **Congratulations! Your AI Medical Clinic is fully alive and on the internet!**

@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
+import User from './models/User.js';
 
 import authRoutes from './routes/authRoutes.js';
 import itemRoutes from './routes/itemRoutes.js';
@@ -16,7 +17,25 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 dotenv.config();
 
 // Connect to database
-connectDB();
+connectDB().then(async () => {
+    // Auto-provision Admin if credentials exist in ENV and no admin exists
+    try {
+        if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+            const adminExists = await User.findOne({ role: 'admin' });
+            if (!adminExists) {
+                await User.create({
+                    name: 'Super Admin',
+                    email: process.env.ADMIN_EMAIL,
+                    password: process.env.ADMIN_PASSWORD,
+                    role: 'admin'
+                });
+                console.log('✅ Default Super Admin provisioned from environment variables.');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Failed to provision default admin:', error);
+    }
+});
 
 const app = express();
 
