@@ -32,6 +32,70 @@ const createPatientProfile = async (req, res, next) => {
     }
 };
 
+// @desc    Register a new user AND create their patient profile (Receptionist flow)
+// @route   POST /api/patients/register
+// @access  Private (Receptionist/Admin)
+const registerPatientWithUser = async (req, res, next) => {
+    try {
+        const { name, email, password, dateOfBirth, gender, phoneNumber, address } = req.body;
+
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            res.status(400);
+            throw new Error('User already exists');
+        }
+
+        const user = await User.create({
+            name,
+            email,
+            password,
+            role: 'patient'
+        });
+
+        const profile = await PatientProfile.create({
+            user: user._id,
+            dateOfBirth,
+            gender,
+            phoneNumber,
+            address
+        });
+
+        res.status(201).json({
+            user: { _id: user._id, name: user.name, email: user.email },
+            profile
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Update patient profile
+// @route   PUT /api/patients/:id
+// @access  Private (Receptionist/Admin/Doctor or own Patient)
+const updatePatientProfile = async (req, res, next) => {
+    try {
+        const profile = await PatientProfile.findById(req.params.id);
+
+        if (profile) {
+            profile.dateOfBirth = req.body.dateOfBirth || profile.dateOfBirth;
+            profile.gender = req.body.gender || profile.gender;
+            profile.phoneNumber = req.body.phoneNumber || profile.phoneNumber;
+            profile.address = req.body.address || profile.address;
+            profile.bloodGroup = req.body.bloodGroup || profile.bloodGroup;
+            profile.allergies = req.body.allergies || profile.allergies;
+            profile.medicalHistorySummary = req.body.medicalHistorySummary || profile.medicalHistorySummary;
+
+            const updatedProfile = await profile.save();
+            res.json(updatedProfile);
+        } else {
+            res.status(404);
+            throw new Error('Patient profile not found');
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @desc    Get patient profile by ID
 // @route   GET /api/patients/:id
 // @access  Private (Doctor, Admin, Receptionist, or the Patient themselves)
@@ -68,4 +132,4 @@ const getPatients = async (req, res, next) => {
     }
 };
 
-export { createPatientProfile, getPatientProfile, getPatients };
+export { createPatientProfile, registerPatientWithUser, updatePatientProfile, getPatientProfile, getPatients };

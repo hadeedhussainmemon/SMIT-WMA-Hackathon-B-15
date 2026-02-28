@@ -1,11 +1,18 @@
 import { useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
 import type { RootState } from '../../store';
 
-import AdminDashboard from './AdminDashboard.tsx';
-import DoctorDashboard from './DoctorDashboard.tsx';
-import ReceptionistDashboard from './ReceptionistDashboard.tsx';
-import PatientDashboard from './PatientDashboard.tsx';
+import DashboardLayout from '../../components/DashboardLayout';
+import ProfileEditor from '../../components/ProfileEditor';
+
+import AdminDashboard from './AdminDashboard';
+import DoctorDashboard from './DoctorDashboard';
+import ReceptionistDashboard from './ReceptionistDashboard';
+import ReceptionistPatients from './ReceptionistPatients';
+import PatientDashboard from './PatientDashboard';
+import AdminStaffManager from './AdminStaffManager';
+import AdminSaaSPlans from './AdminSaaSPlans';
+import AdminAnalytics from './AdminAnalytics';
 
 const DashboardManager = () => {
     const { user } = useSelector((state: RootState) => state.auth);
@@ -14,18 +21,55 @@ const DashboardManager = () => {
         return <Navigate to="/login" replace />;
     }
 
-    switch (user.role) {
-        case 'admin':
-            return <AdminDashboard />;
-        case 'doctor':
-            return <DoctorDashboard />;
-        case 'receptionist':
-            return <ReceptionistDashboard />;
-        case 'patient':
-            return <PatientDashboard />;
-        default:
-            return <Navigate to="/login" replace />;
-    }
+    const renderRoleDashboard = () => {
+        switch (user.role) {
+            case 'admin':
+                return (
+                    <Routes>
+                        <Route path="/" element={<AdminDashboard />} />
+                        <Route path="/staff" element={<AdminStaffManager />} />
+                        <Route path="/plans" element={<AdminSaaSPlans />} />
+                        <Route path="/analytics" element={<AdminAnalytics />} />
+                    </Routes>
+                );
+            case 'doctor':
+                // Dr Dashboard currently handles its own tabs (AI, Schedule) in one file. We can split it later or keep it unified.
+                // We'll leave it as is for now, maybe mapping /ai and / to the same component since it uses state.
+                return (
+                    <Routes>
+                        <Route path="/*" element={<DoctorDashboard />} />
+                    </Routes>
+                );
+            case 'receptionist':
+                return (
+                    <Routes>
+                        <Route path="/" element={<ReceptionistDashboard />} />
+                        <Route path="/patients" element={<ReceptionistPatients />} />
+                    </Routes>
+                );
+            case 'patient':
+                return (
+                    <Routes>
+                        <Route path="/*" element={<PatientDashboard />} />
+                    </Routes>
+                );
+            default:
+                return <Navigate to="/login" replace />;
+        }
+    };
+
+    return (
+        <DashboardLayout>
+            <Routes>
+                <Route path="/profile" element={
+                    <div className="p-4 sm:p-8">
+                        <ProfileEditor />
+                    </div>
+                } />
+                <Route path="/*" element={renderRoleDashboard()} />
+            </Routes>
+        </DashboardLayout>
+    );
 };
 
 export default DashboardManager;

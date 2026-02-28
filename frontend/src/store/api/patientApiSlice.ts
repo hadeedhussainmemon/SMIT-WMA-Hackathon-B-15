@@ -18,11 +18,29 @@ export const patientApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ['Patient'],
         }),
+        registerPatient: builder.mutation({
+            query: (data) => ({
+                url: '/patients/register',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['Patient'],
+        }),
+        updatePatientProfile: builder.mutation({
+            query: ({ id, ...data }) => ({
+                url: `/patients/${id}`,
+                method: 'PUT',
+                body: data,
+            }),
+            invalidatesTags: ['Patient'],
+        }),
     }),
 });
 
 export const {
     useGetPatientsQuery,
     useGetPatientByIdQuery,
-    useCreatePatientProfileMutation
+    useCreatePatientProfileMutation,
+    useRegisterPatientMutation,
+    useUpdatePatientProfileMutation
 } = patientApiSlice;

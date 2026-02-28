@@ -36,19 +36,21 @@ const ReceptionistDashboard = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-50 text-gray-900">
-            <div className="flex-1 overflow-y-auto p-8 max-w-6xl mx-auto">
+        <div className="text-gray-900 p-2">
+            <div className="max-w-6xl space-y-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">Front Desk</h1>
                         <p className="text-gray-500 mt-1">Manage patient flow and scheduling.</p>
                     </div>
-                    <button
-                        onClick={() => setIsBooking(!isBooking)}
-                        className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2"
-                    >
-                        <Plus className="w-5 h-5" /> Book Walk-In
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setIsBooking(!isBooking)}
+                            className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2"
+                        >
+                            <Plus className="w-5 h-5" /> Book Walk-In
+                        </button>
+                    </div>
                 </div>
 
                 {isBooking && (

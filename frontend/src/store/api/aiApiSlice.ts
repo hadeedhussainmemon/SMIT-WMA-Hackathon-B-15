@@ -11,7 +11,14 @@ export const aiApiSlice = apiSlice.injectEndpoints({
         }),
         suggestPrescription: builder.mutation({
             query: (data) => ({
-                url: '/ai/prescription-suggestion',
+                url: '/ai/suggest-prescription',
+                method: 'POST',
+                body: data,
+            }),
+        }),
+        explainPrescription: builder.mutation({
+            query: (data) => ({
+                url: '/ai/explain-prescription',
                 method: 'POST',
                 body: data,
             }),
@@ -19,7 +26,4 @@ export const aiApiSlice = apiSlice.injectEndpoints({
     }),
 });
 
-export const {
-    useAnalyzeSymptomsMutation,
-    useSuggestPrescriptionMutation
-} = aiApiSlice;
+export const { useAnalyzeSymptomsMutation, useSuggestPrescriptionMutation, useExplainPrescriptionMutation } = aiApiSlice;

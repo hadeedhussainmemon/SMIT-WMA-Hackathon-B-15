@@ -7,12 +7,14 @@ import connectDB from './config/db.js';
 import User from './models/User.js';
 
 import authRoutes from './routes/authRoutes.js';
-import itemRoutes from './routes/itemRoutes.js';
+import patientRoutes from './routes/patientRoutes.js';
 import patientRoutes from './routes/patientRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js';
 import prescriptionRoutes from './routes/prescriptionRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import subscriptionRoutes from './routes/subscriptionRoutes.js';
 
 dotenv.config();
 
@@ -71,12 +73,14 @@ app.get('/api', checkHealth);
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/items', itemRoutes);
+app.use('/api/patients', patientRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

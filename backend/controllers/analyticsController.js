@@ -13,13 +13,13 @@ const getClinicOverview = async (req, res, next) => {
             throw new Error('Not authorized as an admin');
         }
 
-        // Parallel data fetching for performance
         const [
             totalPatients,
             totalDoctors,
             totalAppointments,
             totalPrescriptions,
-            appointmentsByStatus
+            appointmentsByStatus,
+            recentAppointments
         ] = await Promise.all([
             PatientProfile.countDocuments({}),
             User.countDocuments({ role: 'doctor' }),
@@ -27,8 +27,22 @@ const getClinicOverview = async (req, res, next) => {
             Prescription.countDocuments({}),
             Appointment.aggregate([
                 { $group: { _id: '$status', count: { $sum: 1 } } }
-            ])
+            ]),
+            Appointment.find({}).sort({ createdAt: -1 }).limit(50)
         ]);
+
+        // Logic: Project load by counting appointments in the next 7 days vs previous 7 days
+        const now = new Date();
+        const nextWeek = new Date(now.getTime() + (7 * 24 * 60 * 60 * 1000));
+        const lastWeek = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+
+        const [upcomingCount, pastWeekCount] = await Promise.all([
+            Appointment.countDocuments({ appointmentDate: { $gte: now, $lte: nextWeek } }),
+            Appointment.countDocuments({ appointmentDate: { $gte: lastWeek, $lt: now } })
+        ]);
+
+        const loadTrend = upcomingCount > pastWeekCount ? 'Increasing' : 'Stable';
+        const projectedLoad = upcomingCount;
 
         res.json({
             overview: {
@@ -36,6 +50,11 @@ const getClinicOverview = async (req, res, next) => {
                 totalDoctors,
                 totalAppointments,
                 totalPrescriptions
+            },
+            trends: {
+                loadTrend,
+                projectedWeeklyLoad: projectedLoad,
+                efficiencyIndex: totalAppointments > 0 ? (totalPrescriptions / totalAppointments).toFixed(2) : 0
             },
             appointmentBreakdown: appointmentsByStatus
         });

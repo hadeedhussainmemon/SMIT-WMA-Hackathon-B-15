@@ -33,10 +33,14 @@ const getAppointments = async (req, res, next) => {
         // Role-based filtering
         if (req.user.role === 'patient') {
             query.patient = req.user._id; // Patients see only their own
-        } else if (req.user.role === 'doctor') {
-            query.doctor = req.user._id;  // Doctors see only their own patients
+        } else {
+            // Doctors/Receptionists/Admins can filter by patientId if provided for history views
+            if (req.query.patientId) {
+                query.patient = req.query.patientId;
+            } else if (req.user.role === 'doctor') {
+                query.doctor = req.user._id; // Default doctor view: their own appointments
+            }
         }
-        // Admins and Receptionists see all (empty query)
 
         const appointments = await Appointment.find(query)
             .populate('patient', 'name email')

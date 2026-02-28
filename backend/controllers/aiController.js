@@ -13,19 +13,28 @@ const analyzeSymptoms = async (req, res, next) => {
 
         const { symptoms, patientAge, patientGender } = req.body;
 
-        const prompt = `Act as an expert medical assistant. I have a patient who is ${patientAge} years old, ${patientGender}. They are experiencing the following symptoms: ${symptoms}. Please provide a concise list of 3-5 possible differential diagnoses. Do not provide medical advice. Return the response formatted clearly.`;
+        const prompt = `Act as an expert medical assistant for a board-certified physician. 
+        A ${patientAge}-year-old ${patientGender} patient presents with: ${symptoms}.
+        
+        TASKS:
+        1. Provide a concise list of 3-5 possible differential diagnoses.
+        2. Assess the clinical risk level (Low, Medium, High).
+        3. Provide immediate clinical advice for the physician (e.g., urgent labs, imaging, or redirection to ER).
+        
+        FORMAT: Return a JSON object with keys: "analysis" (string), "riskLevel" (string), "advice" (string). 
+        Do not include any other text.`;
 
-        // Using Grok API (xAI) standard chat completions endpoint
         const response = await axios.post(
             'https://api.x.ai/v1/chat/completions',
             {
                 messages: [
-                    { role: "system", content: "You are a helpful and expert medical AI assistant for doctors." },
+                    { role: "system", content: "You are an expert clinical diagnostic co-pilot. You output valid JSON only." },
                     { role: "user", content: prompt }
                 ],
                 model: "grok-beta",
                 stream: false,
-                temperature: 0.3
+                response_format: { type: "json_object" },
+                temperature: 0.2
             },
             {
                 headers: {
@@ -35,12 +44,12 @@ const analyzeSymptoms = async (req, res, next) => {
             }
         );
 
-        const aiSuggestion = response.data.choices[0].message.content;
-        res.json({ success: true, analysis: aiSuggestion });
+        const aiResult = JSON.parse(response.data.choices[0].message.content);
+        res.json({ success: true, ...aiResult });
 
     } catch (error) {
         console.error("AI Error:", error.response?.data || error.message);
-        res.status(500).json({ success: false, message: 'Failed to communicate with Grok AI' });
+        res.status(500).json({ success: false, message: 'Failed to communicate with Grok AI node' });
     }
 };
 
@@ -86,4 +95,40 @@ const suggestPrescription = async (req, res, next) => {
     }
 };
 
-export { analyzeSymptoms, suggestPrescription };
+const explainPrescription = async (req, res, next) => {
+    try {
+        const { medicines, diagnosis } = req.body;
+
+        let prompt = `As a friendly medical assistant, explain this prescription to a patient in simple, non-expert terms.\n\nDiagnosis: ${diagnosis}\nMedicines:\n`;
+        medicines.forEach(m => {
+            prompt += `- ${m.name}: ${m.dosage}, ${m.duration}\n`;
+        });
+        prompt += `\nPlease provide:\n1. Purpose of each medicine.\n2. Important lifestyle advice (rest, diet).\n3. Common mild side effects (with clear disclaimer to contact the doctor for severe ones).\n4. A friendly recovery message.`;
+
+        const response = await axios.post(
+            'https://api.x.ai/v1/chat/completions',
+            {
+                messages: [
+                    { role: "system", content: "You are a friendly medical assistant explaining prescriptions to patients in simple terms." },
+                    { role: "user", content: prompt }
+                ],
+                model: "grok-beta",
+                stream: false,
+                temperature: 0.2
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.XAI_API_KEY}`
+                }
+            }
+        );
+
+        const explanation = response.data.choices[0].message.content;
+        res.json({ explanation });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export { analyzeSymptoms, suggestPrescription, explainPrescription };

@@ -24,7 +24,7 @@ function App() {
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardManager />} />
+            <Route path="/dashboard/*" element={<DashboardManager />} />
           </Route>
 
           {/* Fallback Route */}

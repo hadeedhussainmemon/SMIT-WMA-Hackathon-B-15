@@ -3,7 +3,10 @@ import { apiSlice } from './apiSlice';
 export const prescriptionApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getPrescriptions: builder.query({
-            query: () => '/prescriptions',
+            query: (params) => ({
+                url: '/prescriptions',
+                params: params,
+            }),
             providesTags: ['Prescription'],
         }),
         createPrescription: builder.mutation({
