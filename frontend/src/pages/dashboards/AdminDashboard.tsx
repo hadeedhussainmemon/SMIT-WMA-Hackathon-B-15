@@ -10,7 +10,7 @@ const AdminDashboard = () => {
     }
 
     const overview = data?.overview;
-    const chartData = data?.appointmentBreakdown?.map((item: any) => ({
+    const chartData = data?.appointmentBreakdown?.map((item: { _id: string; count: number }) => ({
         name: item._id,
         count: item.count
     })) || [];

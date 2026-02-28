@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, Clock, Plus } from 'lucide-react';
 
 const ReceptionistDashboard = () => {
     const { data: appointments, isLoading: appsLoading } = useGetAppointmentsQuery({});
-    const { data: patients } = useGetPatientsQuery({});
+    useGetPatientsQuery({}); // Just call it to cache if needed, but we don't need the return value here currently
     const [updateStatus] = useUpdateAppointmentStatusMutation();
     const [createAppointment] = useCreateAppointmentMutation();
 
@@ -78,7 +78,7 @@ const ReceptionistDashboard = () => {
                         <tbody className="divide-y divide-gray-100">
                             {appsLoading ? (
                                 <tr><td colSpan={6} className="p-8 text-center text-gray-500 animate-pulse">Loading schedule...</td></tr>
-                            ) : appointments?.map((app: any) => (
+                            ) : appointments?.map((app: { _id: string; patient?: { name: string }; doctor?: { name: string }; appointmentDate: string; reasonForVisit: string; status: string }) => (
                                 <tr key={app._id} className="hover:bg-gray-50/50 transition-colors">
                                     <td className="p-4 font-medium">{app.patient?.name || 'Unknown'}</td>
                                     <td className="p-4 text-gray-600">{app.doctor?.name || 'Unassigned'}</td>
@@ -86,8 +86,8 @@ const ReceptionistDashboard = () => {
                                     <td className="p-4 text-gray-600 truncate max-w-[200px]">{app.reasonForVisit}</td>
                                     <td className="p-4">
                                         <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${app.status === 'Confirmed' ? 'bg-blue-100 text-blue-700' :
-                                                app.status === 'Completed' ? 'bg-green-100 text-green-700' :
-                                                    app.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                                            app.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                                                app.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
                                             }`}>{app.status}</span>
                                     </td>
                                     <td className="p-4 flex gap-2">

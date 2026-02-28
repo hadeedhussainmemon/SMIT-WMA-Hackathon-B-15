@@ -28,7 +28,7 @@ const PatientDashboard = () => {
                             <div className="animate-pulse flex flex-col gap-3"><div className="h-16 bg-gray-100 rounded-xl"></div><div className="h-16 bg-gray-100 rounded-xl"></div></div>
                         ) : (
                             <div className="space-y-4">
-                                {appointments?.map((app: any) => (
+                                {appointments?.map((app: { _id: string; appointmentDate: string; reasonForVisit: string; status: string }) => (
                                     <div key={app._id} className="p-4 rounded-xl border border-gray-100 bg-gray-50/50 flex justify-between items-center">
                                         <div>
                                             <p className="font-semibold text-gray-900">{format(new Date(app.appointmentDate), 'EEEE, MMM do yyyy')}</p>
@@ -55,7 +55,7 @@ const PatientDashboard = () => {
                             <div className="animate-pulse flex flex-col gap-3"><div className="h-16 bg-gray-100 rounded-xl"></div><div className="h-16 bg-gray-100 rounded-xl"></div></div>
                         ) : (
                             <div className="space-y-4">
-                                {prescriptions?.map((px: any) => (
+                                {prescriptions?.map((px: { _id: string; diagnosis: string; doctor?: { name: string }; createdAt: string }) => (
                                     <div key={px._id} className="p-4 rounded-xl border border-emerald-100 bg-emerald-50/30 flex justify-between items-center group">
                                         <div>
                                             <p className="font-semibold text-gray-900 capitalize">{px.diagnosis}</p>

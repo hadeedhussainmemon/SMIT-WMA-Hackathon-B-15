@@ -11,7 +11,7 @@ import type { RootState } from '../../store';
 const DoctorDashboard = () => {
     const { user } = useSelector((state: RootState) => state.auth);
     const [activeTab, setActiveTab] = useState('appointments');
-    const [selectedPatient, setSelectedPatient] = useState<any>(null);
+    const [selectedPatient, setSelectedPatient] = useState<{ _id: string; appointmentId: string; name: string; age?: number; gender?: string } | null>(null);
 
     // RTK Queries & Mutations
     const { data: appointments, isLoading: appsLoading } = useGetAppointmentsQuery({});
@@ -26,8 +26,9 @@ const DoctorDashboard = () => {
     const [diagnosis, setDiagnosis] = useState('');
     const [aiPrescription, setAiPrescription] = useState('');
 
-    const handlePatientSelect = (patient: any, appointment: any) => {
-        setSelectedPatient({ ...patient, appointmentId: appointment._id });
+    const handlePatientSelect = (patient: { _id: string; name: string } | undefined, appointment: { _id: string }) => {
+        if (!patient) return;
+        setSelectedPatient({ _id: patient._id, name: patient.name, appointmentId: appointment._id });
         setActiveTab('symptom-checker');
     };
 
@@ -158,7 +159,7 @@ const DoctorDashboard = () => {
                             </div>
                         ) : (
                             <div className="grid gap-4">
-                                {appointments?.map((app: any) => (
+                                {appointments?.map((app: { _id: string; patient?: { _id: string; name: string }; appointmentDate: string; reasonForVisit: string; status: string }) => (
                                     <div key={app._id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow group">
                                         <div>
                                             <h4 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{app.patient?.name || 'Unknown Patient'}</h4>
