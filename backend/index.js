@@ -7,6 +7,11 @@ import connectDB from './config/db.js';
 
 import authRoutes from './routes/authRoutes.js';
 import itemRoutes from './routes/itemRoutes.js';
+import patientRoutes from './routes/patientRoutes.js';
+import appointmentRoutes from './routes/appointmentRoutes.js';
+import prescriptionRoutes from './routes/prescriptionRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
 
 dotenv.config();
 
@@ -31,8 +36,8 @@ const checkHealth = (req, res) => {
     if (dbState === 1) dbStatus = 'Connected';
     if (dbState === 2) dbStatus = 'Connecting';
 
-    res.status(200).json({ 
-        status: 'API is running', 
+    res.status(200).json({
+        status: 'API is running',
         environment: process.env.NODE_ENV,
         database: dbStatus
     });
@@ -45,6 +50,11 @@ app.get('/api', checkHealth);
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemRoutes);
+app.use('/api/patients', patientRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

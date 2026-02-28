@@ -7,8 +7,7 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 
-// A placeholder for now until you create a Dashboard component in /pages
-const Dashboard = () => <div className="p-8"><h1 className="text-2xl font-bold">Dashboard (Protected)</h1></div>;
+import DashboardManager from './pages/dashboards/DashboardManager.tsx';
 
 function App() {
   return (
@@ -24,7 +23,7 @@ function App() {
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<DashboardManager />} />
           </Route>
 
           {/* Fallback Route */}
