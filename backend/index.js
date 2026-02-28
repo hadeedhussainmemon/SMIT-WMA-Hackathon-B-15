@@ -8,7 +8,6 @@ import User from './models/User.js';
 
 import authRoutes from './routes/authRoutes.js';
 import patientRoutes from './routes/patientRoutes.js';
-import patientRoutes from './routes/patientRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js';
 import prescriptionRoutes from './routes/prescriptionRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
@@ -43,37 +42,19 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: function (origin, callback) {
-        // Reflect the incoming origin explicitly to allow credentials during testing
-        callback(null, origin || '*');
-    },
+    origin: (origin, callback) => callback(null, true),
     credentials: true,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Health Check Logic
-const checkHealth = (req, res) => {
-    const dbState = mongoose.connection.readyState;
-    let dbStatus = 'Disconnected';
-    if (dbState === 1) dbStatus = 'Connected';
-    if (dbState === 2) dbStatus = 'Connecting';
-
-    res.status(200).json({
-        status: 'API is running',
-        environment: process.env.NODE_ENV,
-        database: dbStatus
-    });
-};
-
-// Health Check Routes
-app.get('/', checkHealth);
-app.get('/api', checkHealth);
-
 // Routes
+app.get('/', (req, res) => {
+    res.json({ status: 'API is running', environment: process.env.NODE_ENV, db: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected' });
+});
+
 app.use('/api/auth', authRoutes);
-app.use('/api/patients', patientRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
@@ -85,6 +66,13 @@ app.use('/api/subscriptions', subscriptionRoutes);
 // Error Handling Middleware
 app.use((err, req, res, next) => {
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+
+    // Crucial: Set CORS headers even for errors
+    res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.header("Access-Control-Allow-Credentials", "true");
+
+    console.error(`Status ${statusCode}: ${err.message}`);
+
     res.status(statusCode).json({
         message: err.message,
         stack: process.env.NODE_ENV === 'production' ? null : err.stack,
