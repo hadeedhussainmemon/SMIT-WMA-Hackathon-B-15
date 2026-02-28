@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import User from './models/User.js';
-
 import authRoutes from './routes/authRoutes.js';
 import patientRoutes from './routes/patientRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js';
@@ -17,26 +16,34 @@ import subscriptionRoutes from './routes/subscriptionRoutes.js';
 
 dotenv.config();
 
-// Connect to database
-connectDB().then(async () => {
-    // Auto-provision Admin if credentials exist in ENV and no admin exists
+// Unified Database Connection Middleware
+let cachedDb = null;
+const connectMiddleware = async (req, res, next) => {
     try {
-        if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
-            const adminExists = await User.findOne({ role: 'admin' });
-            if (!adminExists) {
-                await User.create({
-                    name: 'Super Admin',
-                    email: process.env.ADMIN_EMAIL,
-                    password: process.env.ADMIN_PASSWORD,
-                    role: 'admin'
-                });
-                console.log('✅ Default Super Admin provisioned from environment variables.');
+        if (!cachedDb || mongoose.connection.readyState !== 1) {
+            console.log('🔄 Establishing fresh clinical data connection...');
+            cachedDb = await connectDB();
+
+            // Auto-provision Admin on first successful connection
+            if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+                const adminExists = await User.findOne({ role: 'admin' });
+                if (!adminExists) {
+                    await User.create({
+                        name: 'Super Admin',
+                        email: process.env.ADMIN_EMAIL,
+                        password: process.env.ADMIN_PASSWORD,
+                        role: 'admin'
+                    });
+                    console.log('✅ Default Super Admin provisioned.');
+                }
             }
         }
+        next();
     } catch (error) {
-        console.error('❌ Failed to provision default admin:', error);
+        console.error('🚨 Connection Guard Failure:', error);
+        res.status(503).json({ success: false, message: 'Clinical data cluster temporarily unavailable' });
     }
-});
+};
 
 const app = express();
 
@@ -48,10 +55,15 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(connectMiddleware); // Protect all routes with connection guard
 
 // Routes
 app.get('/', (req, res) => {
-    res.json({ status: 'API is running', environment: process.env.NODE_ENV, db: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected' });
+    res.json({
+        status: 'CuraAI Enterprise Node is Active',
+        environment: process.env.NODE_ENV || 'production',
+        db: mongoose.connection.readyState === 1 ? 'Connected (Cluster Stable)' : 'Disconnected (Standby)'
+    });
 });
 
 app.use('/api/auth', authRoutes);

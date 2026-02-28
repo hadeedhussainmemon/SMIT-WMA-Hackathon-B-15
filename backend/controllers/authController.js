@@ -9,8 +9,8 @@ const generateToken = (res, userId) => {
 
     res.cookie('jwt', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
-        sameSite: 'strict',
+        secure: true, // Always true for Vercel HTTPS
+        sameSite: 'none', // Required for cross-site requests between frontend/backend domains
         maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 };
@@ -65,15 +65,16 @@ export const registerUser = async (req, res) => {
     if (user) {
         generateToken(res, user._id);
 
-        // Default Free subscription for new users
-        await Subscription.create({ clinicAdmin: user._id, planTier: 'Free' });
+        // Default subscription for new users: Pro for Doctors (Hackathon Trial), Free for others
+        const tier = role === 'doctor' ? 'Pro' : 'Free';
+        await Subscription.create({ clinicAdmin: user._id, planTier: tier });
 
         res.status(201).json({
             _id: user._id,
             name: user.name,
             email: user.email,
             role: user.role,
-            planTier: 'Free'
+            planTier: tier
         });
     } else {
         res.status(400);

@@ -14,6 +14,8 @@ import AdminStaffManager from './AdminStaffManager';
 import AdminSaaSPlans from './AdminSaaSPlans';
 import AdminAnalytics from './AdminAnalytics';
 
+import NeuralLab from './NeuralLab.tsx';
+
 const DashboardManager = () => {
     const { user } = useSelector((state: RootState) => state.auth);
 
@@ -30,6 +32,7 @@ const DashboardManager = () => {
                         <Route path="/staff" element={<AdminStaffManager />} />
                         <Route path="/plans" element={<AdminSaaSPlans />} />
                         <Route path="/analytics" element={<AdminAnalytics />} />
+                        <Route path="/lab" element={<NeuralLab />} />
                     </Routes>
                 );
             case 'doctor':
@@ -38,6 +41,7 @@ const DashboardManager = () => {
                 return (
                     <Routes>
                         <Route path="/*" element={<DoctorDashboard />} />
+                        <Route path="/lab" element={<NeuralLab />} />
                     </Routes>
                 );
             case 'receptionist':
@@ -50,7 +54,9 @@ const DashboardManager = () => {
             case 'patient':
                 return (
                     <Routes>
-                        <Route path="/*" element={<PatientDashboard />} />
+                        <Route path="/" element={<PatientDashboard />} />
+                        <Route path="/prescriptions" element={<PatientDashboard />} />
+                        <Route path="/lab" element={<NeuralLab />} />
                     </Routes>
                 );
             default:

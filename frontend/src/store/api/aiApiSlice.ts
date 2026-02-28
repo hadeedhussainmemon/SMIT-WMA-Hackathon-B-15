@@ -23,7 +23,19 @@ export const aiApiSlice = apiSlice.injectEndpoints({
                 body: data,
             }),
         }),
+        analyzeReport: builder.mutation({
+            query: (data) => ({
+                url: '/ai/analyze-report',
+                method: 'POST',
+                body: data,
+            }),
+        }),
     }),
 });
 
-export const { useAnalyzeSymptomsMutation, useSuggestPrescriptionMutation, useExplainPrescriptionMutation } = aiApiSlice;
+export const {
+    useAnalyzeSymptomsMutation,
+    useSuggestPrescriptionMutation,
+    useExplainPrescriptionMutation,
+    useAnalyzeReportMutation
+} = aiApiSlice;

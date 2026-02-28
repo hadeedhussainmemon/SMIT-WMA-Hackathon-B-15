@@ -149,4 +149,58 @@ const explainPrescription = async (req, res, next) => {
     }
 };
 
-export { analyzeSymptoms, suggestPrescription, explainPrescription };
+const analyzeReport = async (req, res, next) => {
+    try {
+        const { reportText } = req.body;
+
+        if (!reportText) {
+            res.status(400);
+            throw new Error('Report text is required for analysis');
+        }
+
+        const prompt = `Act as an expert medical consultant. I am providing you with the text extracted from a medical report (e.g., lab results, imaging report, or discharge summary). 
+        
+        REPORT TEXT:
+        """
+        ${reportText}
+        """
+
+        TASKS:
+        1. Summarize the key findings in simple, easy-to-understand language.
+        2. Identify any "Critical Flags" or abnormal values that require immediate attention.
+        3. Suggest follow-up questions for the patient to ask their doctor.
+        4. Provide a general wellness tip related to the findings.
+
+        FORMAT: Return a JSON object with keys: "summary" (string), "criticalFlags" (array of strings), "nextSteps" (array of strings), "wellnessTip" (string). 
+        Do not include any other text. Output valid JSON only.`;
+
+        const response = await axios.post(
+            'https://api.x.ai/v1/chat/completions',
+            {
+                messages: [
+                    { role: "system", content: "You are a world-class medical diagnostic assistant. You interpret complex reports and simplify them for clinical understanding. You output valid JSON only." },
+                    { role: "user", content: prompt }
+                ],
+                model: "grok-beta",
+                stream: false,
+                response_format: { type: "json_object" },
+                temperature: 0.1
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.XAI_API_KEY}`
+                }
+            }
+        );
+
+        const aiResult = JSON.parse(response.data.choices[0].message.content);
+        res.json({ success: true, ...aiResult });
+
+    } catch (error) {
+        console.error("AI Report Error:", error.response?.data || error.message);
+        res.status(500).json({ success: false, message: 'Neural node failed to decode report' });
+    }
+};
+
+export { analyzeSymptoms, suggestPrescription, explainPrescription, analyzeReport };

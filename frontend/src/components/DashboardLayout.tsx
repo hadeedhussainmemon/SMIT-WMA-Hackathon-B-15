@@ -13,7 +13,8 @@ import {
     User,
     CreditCard,
     Activity,
-    Stethoscope
+    Stethoscope,
+    BrainCircuit
 } from 'lucide-react';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -35,10 +36,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             { name: 'Staff Management', icon: Users, path: '/dashboard/staff' },
             { name: 'SaaS Plans', icon: CreditCard, path: '/dashboard/plans' },
             { name: 'Advanced Analytics', icon: BarChart3, path: '/dashboard/analytics' },
+            { name: 'Neural Lab', icon: BrainCircuit, path: '/dashboard/lab' },
         ],
         doctor: [
             { name: 'My Schedule', icon: Calendar, path: '/dashboard' },
             { name: 'AI Assistant', icon: Stethoscope, path: '/dashboard/ai' },
+            { name: 'Neural Lab', icon: BrainCircuit, path: '/dashboard/lab' },
         ],
         receptionist: [
             { name: 'Front Desk', icon: LayoutDashboard, path: '/dashboard' },
@@ -47,6 +50,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         patient: [
             { name: 'My Health', icon: Activity, path: '/dashboard' },
             { name: 'Prescriptions', icon: Pill, path: '/dashboard/prescriptions' },
+            { name: 'Neural Lab', icon: BrainCircuit, path: '/dashboard/lab' },
         ]
     };
 
