@@ -8,41 +8,39 @@ Cura AI is a next-generation **MERN-stack SaaS platform** designed to modernize 
 
 ## 🔥 Professional Features
 
-### 1. 🩺 AI Diagnostic Assistant (Doctor Dashboard)
+### 1. 🧠 Neural Lab (Pro Tier)
+- **Neural Chat Node**: A conversational clinical assistant for real-time medical inquiries and diagnostic reasoning.
+- **Report Decoder**: Automated interpretation of complex medical reports (Lab results, imaging) into structured clinical insights.
+- **High-Fidelity UI**: Glassmorphic dark-mode interface with emerald accents and real-time AI response streaming.
+
+### 2. 🩺 AI Diagnostic Assistant (Doctor Dashboard)
 - **Grok-Powered Symptoms Checker**: Doctors can enter symptoms and vitals to receive a sophisticated differential diagnosis.
 - **Clinical Risk Flagging**: Automatic pattern recognition for life-threatening conditions (e.g., cardiovascular stress).
 - **History-Aware Context**: The AI analysis is integrated with the patient's **Medical Record Timeline**, ensuring longitudinal care.
 
-### 2. 📊 Predictive Analytics (Admin Dashboard)
+### 3. 📊 Predictive Analytics (Admin Dashboard)
 - **Clinic Load Forecasting**: Uses pattern recognition to predict patient volume spikes (e.g., seasonal surges).
 - **Disease Trend Monitoring**: Real-time tracking of emerging health patterns in the community.
 - **Metric Insights**: ROI tracking and efficiency indices for clinic performance.
 
-### 3. 👤 Patient Empowerment & AI Portal
+### 4. 👤 Patient Empowerment & Discovery
+- **Doctor Discovery**: Filtered search for specialists with categorized clinical expertise.
+- **High-Precision Booking**: Guided 3-step appointment flow with real-time slot selection and instant sync.
 - **AI Prescription Explainer**: Transforms complex medical prescriptions into simple English with lifestyle advice.
-- **Digital Health Passport**: Instant access to all past visits, digital prescriptions (PDF), and lab summaries.
-
-### 4. 🛎️ Operation Control (Receptionist)
-- **Real-time Patient Directory**: Advanced search and registration flow.
-- **Dynamic Scheduling**: Glassmorphic front-desk interface for managing appointments.
 
 ---
 
 ## ⚙️ How It Works (System Architecture)
 
-Cura AI operates as a closed-loop clinical environment where data flows seamlessly between four distinct roles:
+Cura AI operates as a closed-loop clinical environment where data flows seamlessly between roles:
 
 ### 🔄 The Clinical Workflow
-1.  **Patient Interaction**: Patients register and book appointments via their specialized portal. Logic is handled by Redux RTK Query, ensuring immediate UI updates.
-2.  **Receptionist Orchestration**: The Front Desk receives a real-time feed of appointments. Confirming an appointment triggers a status update in MongoDB, which reflects instantly on the Doctor's Queue.
+1.  **Discovery & Booking**: Patients find providers and book precise slots via a guided UI. Redux RTK Query handles the state synchronization.
+2.  **Receptionist Orchestration**: The Front Desk manages a real-time feed of registrations and appointment statuses.
 3.  **The AI Examination (Doctor)**:
-    - **Contextual Awareness**: Doctors select a patient from the queue, which pulls that specific patient's **Medical Record Timeline** (Appointments + Prescriptions) using sorted aggregate queries.
-    - **Intelligence Layer**: The **Grok-Beta AI Engine** processes input via specialized prompting. For diagnosis, the backend adds a **Risk Recognition Layer** that scans symptoms for cardiac or neurological red flags *before* returning suggestions.
-4.  **Closing the Loop (Prescription)**: The Doctor signs a digital prescription, which is saved as a PDF and a DB record. The Patient can instantly access this in their portal and use the **AI Prescription Explainer** to understand their recovery plan.
-
-### 🧠 The Intelligence Engine
-- **Pattern Matching**: The Admin Analytics module uses time-series simulation to predict clinic occupancy and disease prevalence.
-- **Decryption Logic**: The Patient AI uses a "Simple English" prompt wrapper around Grok to translate medical jargon into actionable lifestyle advice.
+    - **Contextual Awareness**: Doctors access the **Medical Record Timeline** for deep longitudinal insights.
+    - **Intelligence Layer**: The **Grok-Beta AI Engine** provides differential diagnoses with nested clinical risk flagging.
+4.  **Neural Lab (Advanced Analysis)**: Patients and Doctors use the **Neural Lab** to decode complex lab data and chat with the clinical engine.
 
 ---
 
@@ -50,9 +48,8 @@ Cura AI operates as a closed-loop clinical environment where data flows seamless
 
 - **Frontend**: React (Vite) + Tailwind CSS + Redux Toolkit (RTK Query)
 - **Design**: Premium Glassmorphic UI with `framer-motion` & `lucide-react`
-- **Backend**: Node.js + Express.js + JWT (RBAC)
-- **Database**: MongoDB (Mongoose)
-- **AI Engine**: xAI Grok API Integration
+- **Backend**: Node.js + Express.js + JWT (RBAC) + MongoDB (Mongoose)
+- **AI Engine**: xAI Grok API (Grok-Beta)
 - **PDF**: Digital Signature & Prescription Generation via `jsPDF`
 
 ---
@@ -77,28 +74,21 @@ VITE_API_BASE_URL=http://localhost:5000/api
 ### Quick Start
 1. **Clone & Install**:
    ```bash
-   # Install Backend
+   # Backend
    cd backend && npm install
-   # Install Frontend
+   # Frontend
    cd frontend && npm install
    ```
-2. **Run Development**:
+2. **Seed Data (Recommended)**:
+   Populate the platform with dummy doctors, patients, and clinical records:
+   - *Manual Note: Use the data provided in the walkthrough for testing.*
+3. **Run Development**:
    ```bash
    # Terminal 1 (Backend)
-   cd backend && npm run dev
+   npm run dev
    # Terminal 2 (Frontend)
-   cd frontend && npm run dev
+   npm run dev
    ```
-
----
-
-## ☁️ Deployment (Vercel)
-
-This project is pre-configured for seamless Vercel deployment using the **Production Build Pipeline**.
-
-1. **Deploy Backend**: Point to `/backend` directory, set Framework to `Other`.
-2. **Deploy Frontend**: Point to `/frontend` directory, set Framework to `Vite`.
-3. **Connect**: Update `VITE_API_BASE_URL` on frontend and `FRONTEND_URL` on backend variables.
 
 ---
 
@@ -106,4 +96,4 @@ This project is pre-configured for seamless Vercel deployment using the **Produc
 Developed for the **SMIT WMA Final Hackathon**. Cura AI demonstrates a scalable SaaS model capable of digitizing local clinics with a "Premium-First" UX and integrated Intelligence.
 
 Developed with ❤️ by Hadeed Hussain Memon.
- [GitHub Repository](https://github.com/hadeedhussainmemon/SMIT-WMA-Hackathon-B-15)
+[GitHub Repository](https://github.com/hadeedhussainmemon/SMIT-WMA-Hackathon-B-15)
