@@ -16,8 +16,10 @@ import {
     ChevronRight,
     User,
     Clock,
-    CheckCircle2
+    CheckCircle2,
+    Lock
 } from 'lucide-react';
+import { useGetMySubscriptionQuery } from '../../store/api/subscriptionApiSlice';
 
 const PatientDashboard = () => {
     const { data: appointments, isLoading: appsLoading } = useGetAppointmentsQuery({});
@@ -25,6 +27,8 @@ const PatientDashboard = () => {
     const { data: doctors } = useGetDoctorsQuery({});
     const [createAppointment, { isLoading: booking }] = useCreateAppointmentMutation();
     const [explainPrescription, { isLoading: explaining }] = useExplainPrescriptionMutation();
+    const { data: subscription } = useGetMySubscriptionQuery({});
+    const isPro = subscription?.planTier === 'Pro';
 
     // Modal & Step State
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -183,10 +187,12 @@ const PatientDashboard = () => {
                                             <div className="flex items-center gap-3">
                                                 <button
                                                     onClick={() => handleExplain(px)}
-                                                    className="p-4 bg-slate-900 text-white rounded-2xl hover:bg-emerald-500 transition-all shadow-lg active:scale-95 flex items-center gap-3 font-black text-[10px] uppercase tracking-widest"
+                                                    disabled={!isPro}
+                                                    className={`p-4 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center gap-3 font-black text-[10px] uppercase tracking-widest relative ${!isPro ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-emerald-500'}`}
                                                 >
                                                     <Brain className="w-4 h-4" />
                                                     Explain Insights
+                                                    {!isPro && <Lock className="w-3 h-3 absolute -top-1 -right-1" />}
                                                 </button>
                                             </div>
                                         </div>

@@ -149,19 +149,19 @@ const explainPrescription = async (req, res, next) => {
     }
 };
 
-const analyzeReport = async (req, res, next) => {// @desc    Conversational Health Bot (Neural Chat)
-    // @route   POST /api/ai/neural-chat
-    // @access  Private
-    export const neuralChat = async (req, res, next) => {
-        try {
-            const { messages } = req.body;
+// @desc    Conversational Health Bot (Neural Chat)
+// @route   POST /api/ai/neural-chat
+// @access  Private
+const neuralChat = async (req, res, next) => {
+    try {
+        const { messages } = req.body;
 
-            if (!messages || !Array.isArray(messages)) {
-                res.status(400);
-                throw new Error('Please provide valid message history');
-            }
+        if (!messages || !Array.isArray(messages)) {
+            res.status(400);
+            throw new Error('Please provide valid message history');
+        }
 
-            const systemPrompt = `You are the CuraAI Neural Assistant, an advanced clinical companion. 
+        const systemPrompt = `You are the CuraAI Neural Assistant, an advanced clinical companion. 
         Your goal is to assist patients and doctors with medical inquiries, diagnostic reasoning, and health management.
         Guidelines:
         - Be professional, empathetic, and scientifically accurate.
@@ -170,33 +170,35 @@ const analyzeReport = async (req, res, next) => {// @desc    Conversational Heal
         - If the user is a doctor, provide deep clinical insights.
         - Keep responses concise but comprehensive.`;
 
-            const response = await axios.post(
-                'https://api.x.ai/v1/chat/completions',
-                {
-                    model: 'grok-beta',
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        ...messages
-                    ],
-                    temperature: 0.7,
+        const response = await axios.post(
+            'https://api.x.ai/v1/chat/completions',
+            {
+                model: 'grok-beta',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    ...messages
+                ],
+                temperature: 0.7,
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
+                    'Content-Type': 'application/json',
                 },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+            }
+        );
 
-            res.json({
-                reply: response.data.choices[0].message.content,
-                provider: 'Grok-Neural-Engine'
-            });
-        } catch (error) {
-            console.error('Neural Chat Error:', error.response?.data || error.message);
-            next(error);
-        }
-    };
+        res.json({
+            reply: response.data.choices[0].message.content,
+            provider: 'Grok-Neural-Engine'
+        });
+    } catch (error) {
+        console.error('Neural Chat Error:', error.response?.data || error.message);
+        next(error);
+    }
+};
+
+const analyzeReport = async (req, res, next) => {
     try {
         const { reportText } = req.body;
 
@@ -208,30 +210,28 @@ const analyzeReport = async (req, res, next) => {// @desc    Conversational Heal
         const prompt = `Act as an expert medical consultant. I am providing you with the text extracted from a medical report (e.g., lab results, imaging report, or discharge summary). 
         
         REPORT TEXT:
-        """
         ${reportText}
-        """
 
-        TASKS:
-        1. Summarize the key findings in simple, easy-to-understand language.
-        2. Identify any "Critical Flags" or abnormal values that require immediate attention.
-        3. Suggest follow-up questions for the patient to ask their doctor.
-        4. Provide a general wellness tip related to the findings.
+        Please analyze this data and return a JSON object with the following structure:
+        {
+          "summary": "Concise high-level summary of findings",
+          "criticalFlags": ["Array of critical or abnormal values that need immediate attention"],
+          "nextSteps": ["Recommended follow-up actions or specialist consultations"],
+          "wellnessTip": "A positive, health-oriented suggestion based on the context"
+        }
 
-        FORMAT: Return a JSON object with keys: "summary" (string), "criticalFlags" (array of strings), "nextSteps" (array of strings), "wellnessTip" (string). 
-        Do not include any other text. Output valid JSON only.`;
+        Ensure the response is strictly valid JSON. Format complex medical data into human-readable insights. Always emphasize that this is an AI-assisted interpretation and requires a final review by a CuraAI clinical professional.`;
 
         const response = await axios.post(
             'https://api.x.ai/v1/chat/completions',
             {
                 messages: [
-                    { role: "system", content: "You are a world-class medical diagnostic assistant. You interpret complex reports and simplify them for clinical understanding. You output valid JSON only." },
+                    { role: "system", content: "You are a professional medical report interpreter. You output only valid JSON." },
                     { role: "user", content: prompt }
                 ],
                 model: "grok-beta",
                 stream: false,
-                response_format: { type: "json_object" },
-                temperature: 0.1
+                response_format: { type: "json_object" }
             },
             {
                 headers: {
@@ -250,4 +250,4 @@ const analyzeReport = async (req, res, next) => {// @desc    Conversational Heal
     }
 };
 
-export { analyzeSymptoms, suggestPrescription, explainPrescription, analyzeReport };
+export { analyzeSymptoms, suggestPrescription, explainPrescription, analyzeReport, neuralChat };

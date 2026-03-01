@@ -4,20 +4,22 @@ import {
     BrainCircuit,
     Zap,
     AlertCircle,
-    CheckCircle2,
     Loader2,
     Sparkles,
     FileSearch,
-    ClipboardCheck,
     MessageSquare,
     Send,
     Bot,
     User,
-    ArrowRight
+    ArrowRight,
+    Lock
 } from 'lucide-react';
+import { useGetMySubscriptionQuery } from '../../store/api/subscriptionApiSlice';
 
 const NeuralLab = () => {
     const [activeView, setActiveView] = useState<'analyzer' | 'chat'>('analyzer');
+    const { data: subscription } = useGetMySubscriptionQuery({});
+    const isPro = subscription?.planTier === 'Pro';
 
     // --- Report Analyzer State ---
     const [reportText, setReportText] = useState('');
@@ -89,15 +91,17 @@ const NeuralLab = () => {
                         <div className="bg-slate-900 p-2 rounded-[2.5rem] flex items-center gap-2 shadow-2xl">
                             <button
                                 onClick={() => setActiveView('analyzer')}
-                                className={`px-8 py-4 rounded-[1.8rem] transition-all font-black text-xs uppercase tracking-widest flex items-center gap-3 ${activeView === 'analyzer' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-white'}`}
+                                className={`px-8 py-4 rounded-[1.8rem] transition-all font-black text-xs uppercase tracking-widest flex items-center gap-3 relative ${activeView === 'analyzer' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-white'}`}
                             >
                                 <FileSearch className="w-4 h-4" /> Reports
+                                {!isPro && <Lock className="w-3 h-3 absolute top-2 right-2 text-emerald-400" />}
                             </button>
                             <button
                                 onClick={() => setActiveView('chat')}
-                                className={`px-8 py-4 rounded-[1.8rem] transition-all font-black text-xs uppercase tracking-widest flex items-center gap-3 ${activeView === 'chat' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-white'}`}
+                                className={`px-8 py-4 rounded-[1.8rem] transition-all font-black text-xs uppercase tracking-widest flex items-center gap-3 relative ${activeView === 'chat' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-white'}`}
                             >
                                 <MessageSquare className="w-4 h-4" /> Neural Chat
+                                {!isPro && <Lock className="w-3 h-3 absolute top-2 right-2 text-emerald-400" />}
                             </button>
                         </div>
                     </div>
@@ -121,11 +125,11 @@ const NeuralLab = () => {
                             />
                             <button
                                 onClick={handleAnalyze}
-                                disabled={analyzing || !reportText.trim()}
+                                disabled={analyzing || !reportText.trim() || !isPro}
                                 className="mt-8 w-full py-6 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.25em] shadow-xl hover:bg-emerald-500 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-30 disabled:hover:bg-slate-900 flex items-center justify-center gap-4 group"
                             >
                                 {analyzing ? <Loader2 className="w-6 h-6 animate-spin" /> : <Sparkles className="w-6 h-6 text-emerald-400 group-hover:rotate-12 transition-transform" />}
-                                Decode Medical Insights
+                                {isPro ? 'Decode Medical Insights' : 'Pro Subscription Required'}
                             </button>
                         </div>
                     </div>
@@ -253,12 +257,13 @@ const NeuralLab = () => {
                                 value={chatInput}
                                 onChange={(e) => setChatInput(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleChatSend()}
-                                placeholder="Consult the Neural Assistant about symptoms or medical data..."
-                                className="flex-1 bg-slate-50 border border-slate-200 rounded-[2.5rem] py-6 px-10 text-slate-900 font-black placeholder:text-slate-400 outline-none focus:bg-white focus:border-emerald-500 focus:ring-8 focus:ring-emerald-500/5 transition-all shadow-inner text-lg"
+                                disabled={!isPro}
+                                placeholder={isPro ? "Consult the Neural Assistant about symptoms or medical data..." : "Upgrade to Pro to unlock clinical chat..."}
+                                className="flex-1 bg-slate-50 border border-slate-200 rounded-[2.5rem] py-6 px-10 text-slate-900 font-black placeholder:text-slate-400 outline-none focus:bg-white focus:border-emerald-500 focus:ring-8 focus:ring-emerald-500/5 transition-all shadow-inner text-lg disabled:opacity-50"
                             />
                             <button
                                 onClick={handleChatSend}
-                                disabled={chatting || !chatInput.trim()}
+                                disabled={chatting || !chatInput.trim() || !isPro}
                                 className="p-6 bg-slate-900 hover:bg-emerald-500 disabled:opacity-30 rounded-[2rem] text-white transition-all shadow-2xl active:scale-95 group"
                             >
                                 <Send className="w-6 h-6 group-hover:rotate-12 transition-transform" />

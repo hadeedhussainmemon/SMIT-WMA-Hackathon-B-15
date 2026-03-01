@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import User from './models/User.js';
+import Subscription from './models/Subscription.js';
 import authRoutes from './routes/authRoutes.js';
 import patientRoutes from './routes/patientRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js';
@@ -21,7 +22,7 @@ let cachedDb = null;
 const connectMiddleware = async (req, res, next) => {
     try {
         if (!cachedDb || mongoose.connection.readyState !== 1) {
-            console.log('🔄 Establishing fresh clinical data connection...');
+            console.log('🧬 Astra-Net: Clinical Data Synchronization Established');
             cachedDb = await connectDB();
 
             // Auto-provision Admin on first successful connection
