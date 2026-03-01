@@ -30,6 +30,13 @@ export const aiApiSlice = apiSlice.injectEndpoints({
                 body: data,
             }),
         }),
+        neuralChat: builder.mutation({
+            query: (data) => ({
+                url: '/ai/neural-chat',
+                method: 'POST',
+                body: data,
+            }),
+        }),
     }),
 });
 
@@ -37,5 +44,6 @@ export const {
     useAnalyzeSymptomsMutation,
     useSuggestPrescriptionMutation,
     useExplainPrescriptionMutation,
-    useAnalyzeReportMutation
+    useAnalyzeReportMutation,
+    useNeuralChatMutation
 } = aiApiSlice;

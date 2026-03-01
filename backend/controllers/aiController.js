@@ -149,7 +149,54 @@ const explainPrescription = async (req, res, next) => {
     }
 };
 
-const analyzeReport = async (req, res, next) => {
+const analyzeReport = async (req, res, next) => {// @desc    Conversational Health Bot (Neural Chat)
+    // @route   POST /api/ai/neural-chat
+    // @access  Private
+    export const neuralChat = async (req, res, next) => {
+        try {
+            const { messages } = req.body;
+
+            if (!messages || !Array.isArray(messages)) {
+                res.status(400);
+                throw new Error('Please provide valid message history');
+            }
+
+            const systemPrompt = `You are the CuraAI Neural Assistant, an advanced clinical companion. 
+        Your goal is to assist patients and doctors with medical inquiries, diagnostic reasoning, and health management.
+        Guidelines:
+        - Be professional, empathetic, and scientifically accurate.
+        - provide structured advice but always include a disclaimer to consult their specific doctor at CuraAI.
+        - If the user is a patient, explain complex terms simply.
+        - If the user is a doctor, provide deep clinical insights.
+        - Keep responses concise but comprehensive.`;
+
+            const response = await axios.post(
+                'https://api.x.ai/v1/chat/completions',
+                {
+                    model: 'grok-beta',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        ...messages
+                    ],
+                    temperature: 0.7,
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+
+            res.json({
+                reply: response.data.choices[0].message.content,
+                provider: 'Grok-Neural-Engine'
+            });
+        } catch (error) {
+            console.error('Neural Chat Error:', error.response?.data || error.message);
+            next(error);
+        }
+    };
     try {
         const { reportText } = req.body;
 

@@ -5,7 +5,7 @@ import { protect, admin } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.route('/mine')
-    .get(protect, admin, getMySubscription);
+    .get(protect, getMySubscription);
 
 router.route('/toggle')
     .put(protect, admin, toggleSubscription);

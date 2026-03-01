@@ -73,4 +73,16 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
-export { getUsers, createUser, deleteUser };
+// @desc    Get all doctors (for patient discovery)
+// @route   GET /api/users/doctors
+// @access  Private
+const getDoctors = async (req, res, next) => {
+    try {
+        const doctors = await User.find({ role: 'doctor' }).select('-password');
+        res.json(doctors);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export { getUsers, createUser, deleteUser, getDoctors };
