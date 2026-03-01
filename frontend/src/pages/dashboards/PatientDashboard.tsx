@@ -6,13 +6,10 @@ import { useGetDoctorsQuery } from '../../store/api/userApiSlice';
 import { format, addDays, setHours, setMinutes, isSameDay } from 'date-fns';
 import {
     Calendar,
-    Download,
     Pill,
-    Sparkles,
     X,
     Brain,
     Loader2,
-    Stethoscope,
     ChevronRight,
     User,
     Clock,
@@ -36,7 +33,6 @@ const PatientDashboard = () => {
     const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [selectedTime, setSelectedTime] = useState<string>('');
-    const [bookingSuccess, setBookingSuccess] = useState(false);
 
     // AI Explanation State
     const [showAiModal, setShowAiModal] = useState(false);
@@ -80,7 +76,6 @@ const PatientDashboard = () => {
                 appointmentDate: appointmentDate.toISOString(),
                 reasonForVisit: 'General Checkup'
             }).unwrap();
-            setBookingSuccess(true);
             setBookingStep(4);
         } catch (error) {
             console.error('Booking failed', error);
@@ -92,7 +87,6 @@ const PatientDashboard = () => {
         setBookingStep(1);
         setSelectedDoctor(null);
         setSelectedTime('');
-        setBookingSuccess(false);
     };
 
     return (
